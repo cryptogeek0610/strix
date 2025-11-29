@@ -3,8 +3,21 @@ import re
 from pathlib import Path
 from typing import Any, cast
 
-from openhands_aci import file_editor
-from openhands_aci.utils.shell import run_shell_cmd
+try:
+    from openhands_aci import file_editor
+    from openhands_aci.utils.shell import run_shell_cmd
+except ImportError:
+    import subprocess
+    
+    def file_editor(**kwargs):
+        return "File editor not available (openhands_aci missing)"
+
+    def run_shell_cmd(cmd):
+        try:
+            result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            return result.returncode, result.stdout, result.stderr
+        except Exception as e:
+            return 1, "", str(e)
 
 from strix.tools.registry import register_tool
 

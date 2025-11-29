@@ -86,6 +86,8 @@ strix --target ./app-directory
 
 Want to skip the local setup, API keys, and unpredictable LLM costs? Run the hosted cloud version of Strix at **[app.usestrix.com](https://app.usestrix.com)**.
 
+Alternatively, if you prefer to manage your own infrastructure, check out our [**Self-Hosting Guide**](HOSTING.md).
+
 Launch a scan in just a few minutes—no setup or configuration required—and you’ll get:
 
 - **A full pentest report** with validated findings and clear remediation steps

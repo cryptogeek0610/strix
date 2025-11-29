@@ -279,7 +279,7 @@ Examples:
         "-t",
         "--target",
         type=str,
-        required=True,
+        required=False,
         action="append",
         help="Target to test (URL, repository, local directory path, domain name, or IP address). "
         "Can be specified multiple times for multi-target scans.",
@@ -313,6 +313,12 @@ Examples:
         ),
     )
 
+    parser.add_argument(
+        "--web",
+        action="store_true",
+        help="Start the Strix Web Interface",
+    )
+
     args = parser.parse_args()
 
     if args.instruction:
@@ -327,6 +333,9 @@ Examples:
                 parser.error(f"Failed to read instruction file '{instruction_path}': {e}")
 
     args.targets_info = []
+    if args.target is None:
+        args.target = []
+
     for target in args.target:
         try:
             target_type, target_dict = infer_target_type(target)
@@ -341,6 +350,9 @@ Examples:
             )
         except ValueError:
             parser.error(f"Invalid target '{target}'")
+
+    if not args.target and not args.web:
+        parser.error("the following arguments are required: -t/--target (unless using --web)")
 
     assign_workspace_subdirs(args.targets_info)
 
@@ -467,8 +479,7 @@ def main() -> None:
     check_docker_installed()
     pull_docker_image()
 
-    validate_environment()
-    asyncio.run(warm_up_llm())
+
 
     if not args.run_name:
         args.run_name = generate_run_name(args.targets_info)
@@ -482,9 +493,24 @@ def main() -> None:
 
     args.local_sources = collect_local_sources(args.targets_info)
 
+    args.local_sources = collect_local_sources(args.targets_info)
+
+    if args.web:
+        import uvicorn
+        from strix.server.app import app
+        console = Console()
+        console.print("[bold green]🚀 Starting Strix Web Interface...[/]")
+        console.print("👉 Open [bold cyan]http://localhost:8000[/] in your browser")
+        uvicorn.run(app, host="0.0.0.0", port=8000)
+        return
+
     if args.non_interactive:
+        validate_environment()
+        asyncio.run(warm_up_llm())
         asyncio.run(run_cli(args))
     else:
+        validate_environment()
+        asyncio.run(warm_up_llm())
         asyncio.run(run_tui(args))
 
     results_path = Path("strix_runs") / args.run_name
