@@ -1,0 +1,21 @@
+services:
+  strix:
+    build: .
+    container_name: strix
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount the Docker socket to allow Strix to spawn sandbox containers
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Persist application data if needed (optional, depending on where Strix stores data)
+      # - strix_data:/app/data
+    environment:
+      # LLM Configuration (Replace with your keys or use a .env file)
+      - STRIX_LLM=${STRIX_LLM:-openai/gpt-4o}
+      - LLM_API_KEY=${LLM_API_KEY}
+      # Optional: Search API Keys
+      - PERPLEXITY_API_KEY=${PERPLEXITY_API_KEY}
+    restart: unless-stopped
+
+# volumes:
+#   strix_data:

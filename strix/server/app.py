@@ -85,8 +85,24 @@ async def start_scan(request: ScanRequest, background_tasks: BackgroundTasks) ->
     
     tracer.set_scan_config(scan_config)
 
+    # Apply Settings
+    settings = settings_manager.get_settings()
+    
+    if settings.api_key:
+        os.environ["LLM_API_KEY"] = settings.api_key
+        import litellm
+        litellm.api_key = settings.api_key
+        
+    if settings.api_base:
+        os.environ["LLM_API_BASE"] = settings.api_base
+        import litellm
+        litellm.api_base = settings.api_base
+
     # Initialize Agent
-    llm_config = LLMConfig()
+    llm_config = LLMConfig(
+        model_name=settings.model_name,
+        timeout=settings.timeout
+    )
     agent_config = {
         "llm_config": llm_config,
         "max_iterations": 300,
@@ -151,6 +167,7 @@ async def stop_scan() -> dict[str, str]:
 class Settings(BaseModel):
     model_name: str = "openai/gpt-4"
     api_base: str | None = None
+    api_key: str | None = None
     timeout: int = 600
     default_instruction: str | None = None
 

@@ -198,7 +198,30 @@ jobs:
         run: strix -n -t ./
 ```
 
-### ⚙️ Configuration
+## 🐳 Docker Quick Start
+
+You can easily run Strix using Docker. This is the recommended way to run the web interface without installing Python dependencies on your host machine.
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/usestrix/strix.git
+    cd strix
+    ```
+
+2.  **Set your API keys:**
+    Create a `.env` file in the root directory or export the variables in your shell.
+    ```bash
+    export LLM_API_KEY="sk-..."
+    ```
+
+3.  **Run with Docker Compose:**
+    ```bash
+    docker compose up --build
+    ```
+
+    The web interface will be available at `http://localhost:8000`.
+
+## ⚙️ Configuration
 
 ```bash
 export STRIX_LLM="openai/gpt-5"
